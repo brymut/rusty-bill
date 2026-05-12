@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::io::{self, Write};
+use std::io;
 
 #[derive(Debug, Clone)]
 pub struct Bill {
