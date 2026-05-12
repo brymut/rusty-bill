@@ -22,6 +22,10 @@ impl Bills {
         self.inner.insert(bill.name.clone(), bill);
     }
 
+    fn remove(&mut self, name: &str) -> bool {
+        self.inner.remove(name).is_some()
+    }
+
     fn get_all(&self) -> Vec<&Bill> {
         self.inner.values().collect()
     }
@@ -66,6 +70,22 @@ fn add_bill_menu(bills: &mut Bills) {
     println!("Bill added!");
 }
 
+fn remove_bill_menu(bills: &mut Bills) {
+    for bill in bills.get_all() {
+        println!("{:?}", bill);
+    }
+    println!("Enter bill name to remove:");
+    let name = match get_input() {
+        Some(name) => name,
+        None => return,
+    };
+    if bills.remove(&name) {
+        println!("Bill removed");
+    } else {
+        println!("Bill not found");
+    }
+}
+
 fn view_bills_menu(bills: &Bills) {
     for bill in bills.get_all() {
         println!("{:?}", bill);
@@ -77,6 +97,7 @@ fn main_menu() {
     println!("== Bill Manager ==");
     println!("1. Add Bill");
     println!("2. View Bills");
+    println!("3. Remove Bill");
     println!("Enter selection:");
 }
 
@@ -93,6 +114,7 @@ fn main() {
         match input.as_str() {
             "1" => add_bill_menu(&mut bills),
             "2" => view_bills_menu(&bills),
+            "3" => remove_bill_menu(&mut bills),
             _ => break,
         }
     }
