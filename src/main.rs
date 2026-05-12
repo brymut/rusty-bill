@@ -26,6 +26,15 @@ impl Bills {
         self.inner.remove(name).is_some()
     }
 
+    fn update(&mut self, name: &str, amount: f64) -> bool {
+        if let Some(bill) = self.inner.get_mut(name) {
+            bill.amount = amount;
+            true
+        } else {
+            false
+        }
+    }
+
     fn get_all(&self) -> Vec<&Bill> {
         self.inner.values().collect()
     }
@@ -45,7 +54,7 @@ fn get_input() -> Option<String> {
 }
 
 fn get_bill_amount() -> Option<f64> {
-    println!("Amount:");
+    println!("Amount (or Enter to cancel):");
     loop {
         let input = get_input()?;
         match input.parse::<f64>() {
@@ -56,7 +65,7 @@ fn get_bill_amount() -> Option<f64> {
 }
 
 fn add_bill_menu(bills: &mut Bills) {
-    println!("Bill Name:");
+    println!("Bill Name (or Enter to cancel):");
     let name = match get_input() {
         Some(name) => name,
         None => return,
@@ -74,7 +83,7 @@ fn remove_bill_menu(bills: &mut Bills) {
     for bill in bills.get_all() {
         println!("{:?}", bill);
     }
-    println!("Enter bill name to remove:");
+    println!("Enter bill name to remove (or Enter to cancel):");
     let name = match get_input() {
         Some(name) => name,
         None => return,
@@ -86,9 +95,34 @@ fn remove_bill_menu(bills: &mut Bills) {
     }
 }
 
-fn view_bills_menu(bills: &Bills) {
+fn edit_bill_menu(bills: &mut Bills) {
     for bill in bills.get_all() {
         println!("{:?}", bill);
+    }
+    println!("Enter bill name to edit (or Enter to cancel):");
+    let name = match get_input() {
+        Some(name) => name,
+        None => return,
+    };
+    let amount = match get_bill_amount() {
+        Some(amount) => amount,
+        None => return,
+    };
+    if bills.update(&name, amount) {
+        println!("Bill updated");
+    } else {
+        println!("Bill not found");
+    }
+}
+
+fn view_bills_menu(bills: &Bills) {
+    let all_bills = bills.get_all();
+    if all_bills.is_empty() {
+        println!("No bills found.");
+    } else {
+        for bill in all_bills {
+            println!("{:?}", bill);
+        }
     }
 }
 
@@ -98,7 +132,8 @@ fn main_menu() {
     println!("1. Add Bill");
     println!("2. View Bills");
     println!("3. Remove Bill");
-    println!("Enter selection:");
+    println!("4. Edit Bill");
+    println!("Enter selection (anything else to quit):");
 }
 
 fn main() {
@@ -108,14 +143,16 @@ fn main() {
         main_menu();
         let input = match get_input() {
             Some(input) => input,
-            None => continue,
+            None => break,
         };
 
         match input.as_str() {
             "1" => add_bill_menu(&mut bills),
             "2" => view_bills_menu(&bills),
             "3" => remove_bill_menu(&mut bills),
+            "4" => edit_bill_menu(&mut bills),
             _ => break,
         }
     }
+    println!("Goodbye!");
 }
